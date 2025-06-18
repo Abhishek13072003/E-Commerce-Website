@@ -3,8 +3,8 @@ function Home(){
     return (
         <div className ="Container text-center">
             <h1>Welcome to Home Page</h1>
-            <link to='/'>Home</link>
-            <link to='/login'>Login</link>
+            <Link to='/'>Home</Link>
+            <Link to='/login'>Login</Link>
         </div>
 
     );
