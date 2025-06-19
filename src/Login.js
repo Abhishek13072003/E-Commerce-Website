@@ -1,136 +1,94 @@
-import React, { Fragment, useState } from "react";
-import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFacebook, faGoogle } from "@fortawesome/free-brands-svg-icons";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+function Login({ updateUserDetails }) {
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
 
-const SocialLoginButton = () => (
-	<Fragment>
-		<Button
-			variant="primary"
-			className="ezy__signin6-btn w-100 d-flex align-items-center mb-3"
-		>
-			<span className="text-white fs-4 lh-1">
-				<FontAwesomeIcon icon={faFacebook} />
-			</span>
-			<span className="w-100 text-center text-white">
-				Continue with Facebook
-			</span>
-		</Button>
-		<Button
-			variant="danger"
-			className="ezy__signin6-btn w-100 d-flex align-items-center"
-		>
-			<span className="text-white fs-4 lh-1">
-				<FontAwesomeIcon icon={faGoogle} />
-			</span>
-			<span className="w-100 text-center text-white">Continue with Google</span>
-		</Button>
-	</Fragment>
-);
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState(null);
 
-const SignInForm = () => {
-	const [validated, setValidated] = useState(false);
+  const handleChange = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
 
-	const handleSubmit = (event) => {
-		event.preventDefault();
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
 
-		const form = event.currentTarget;
-		if (form.checkValidity() === false) {
-			event.preventDefault();
-			event.stopPropagation();
-		}
+  const validate = () => {
+    let isValid = true;
+    let newErrors = {};
 
-		setValidated(true);
-	};
+    if (formData.username.trim() === '') {
+      isValid = false;
+      newErrors.username = "Username is mandatory";
+    }
 
-	return (
-		<Form
-			className="pe-md-4"
-			noValidate
-			validated={validated}
-			onSubmit={handleSubmit}
-		>
-			<Form.Group className="mb-4 mt-2">
-				<Form.Label>Email Address</Form.Label>
-				<Form.Control type="email" placeholder="Enter Email Address" />
-				<Form.Control.Feedback type="valid">Message</Form.Control.Feedback>
-			</Form.Group>
-			<Form.Group className="mb-2 mt-2">
-				<Form.Label>Password</Form.Label>
-				<Form.Control type="password" placeholder="Enter Password" />
-				<Form.Control.Feedback type="valid">Message</Form.Control.Feedback>
-			</Form.Group>
-			<Form.Group className="mb-3">
-				<Form.Check
-					type="checkbox"
-					id="signin6-remember-me"
-					label="Remember me"
-				/>
-				<Form.Control.Feedback type="valid">Message</Form.Control.Feedback>
-			</Form.Group>
+    if (formData.password.trim() === '') {
+      isValid = false;
+      newErrors.password = "Password is mandatory";
+    }
 
-			<Button
-				variant=""
-				type="submit"
-				className="ezy__signin6-btn-submit w-100"
-			>
-				Log In
-			</Button>
-			<Button variant="" type="button" className="w-100">
-				Forget your password?
-			</Button>
-		</Form>
-	);
-};
+    setErrors(newErrors);
+    return isValid;
+  };
 
-const SignInFormCard = () => (
-	<Card className="ezy__signin6-form-card">
-		<Card.Body className="p-0">
-			<h2 className="ezy__signin6-heading mb-3">Welcome to Shopoholics</h2>
-			<p className="mb-4 mb-md-5">
-				<span className="mb-0 opacity-50 lh-1">Don't have an account?</span>
-				<Button variant="link" className="py-0 text-dark text-decoration-none">
-					Create account
-				</Button>
-			</p>
+  const navigate = useNavigate();
 
-			<SignInForm />
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-			<div className="position-relative ezy__signin6-or-separator">
-				<hr className="my-4 my-md-5" />
-				<span className="px-2">Or</span>
-			</div>
+    if (validate()) {
+      if (formData.username === 'admin' && formData.password === 'admin') {
+        updateUserDetails({
+			name: 'John Cena',
+			email: 'john.cena@example.com'
 
-			<SocialLoginButton />
-		</Card.Body>
-	</Card>
-);
+		});
+		navigate('/dashboard');
+      } else {
+        setMessage('❌ Invalid Credentials');
+      }
+    }
+  };
 
-const Login = () => {
-	return (
-		<section className="ezy__signin6 dark d-flex">
-			<Container>
-				<Row className="justify-content-between h-100">
-					<Col lg={6}>
-						<div
-							className="ezy__signin6-bg-holder d-none d-lg-block h-100"
-							style={{
-								backgroundImage:
-									"url(https://cdn.easyfrontend.com/pictures/sign-in-up/sign1.jpg)",
-							}}
-						/>
-					</Col>
-					<Col lg={5} className="py-5">
-						<Row className="align-items-center h-100">
-							<Col xs={12}>
-								<SignInFormCard />
-							</Col>
-						</Row>
-					</Col>
-				</Row>
-			</Container>
-		</section>
-	);
-};
+  return (
+    <div className="container text-center mt-4">
+      <h1>Login Page</h1>
+      {message && <p><strong>{message}</strong></p>}
+      <form onSubmit={handleSubmit}>
+        <div className="mb-3">
+          <label>Username:</label><br />
+          <input
+            type="text"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+          />
+          {errors.username && <div style={{ color: "red" }}>{errors.username}</div>}
+        </div>
+
+        <div className="mb-3">
+          <label>Password:</label><br />
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+          {errors.password && <div style={{ color: "red" }}>{errors.password}</div>}
+        </div>
+
+        <div>
+          <button type="submit">Submit</button>
+        </div>
+      </form>
+    </div>
+  );
+}
 
 export default Login;
